@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milo Tienda de Pintura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #fce4ec;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #880e4f;
+        }
+        .formulario {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 150px;
+            margin-right: 10px;
+        }
+        .btn-archivo {
+            background-color: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .btn-archivo:hover {
+            background-color: #c2185b;
+        }
+        #archivoInput {
+            display: none;
+        }
+        .estructura-tienda {
+            background-color: #fff9c4;
+            border: 5px solid #fbc02d;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .letrero-tienda {
+            background-color: #fbc02d;
+            color: #3e2723;
+            padding: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .galeria {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .tarjeta-pintura {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 200px;
+            border: 2px solid #ffe0b2;
+        }
+        .tarjeta-pintura img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .precio {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+        .btn-comprar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-comprar:hover {
+            background-color: #45a049;
+        }
+
+        /* Ventana flotante (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-contenido {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .select-pago {
+            width: 100%;
+            padding: 8px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .btn-modal-confirmar {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+        }
+        .btn-modal-confirmar:hover {
+            background-color: #0b7dda;
+        }
+        .btn-modal-cancelar {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .btn-modal-cancelar:hover {
+            background-color: #da190b;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Milo Tienda de Pintura</h1>
+    <p>Pon el precio y sube tu pintura para colocarla dentro de la tienda.</p>
+
+    <!-- Formulario para agregar -->
+    <div class="formulario">
+        <input type="number" id="precioInput" placeholder="Precio ($)" min="0">
+        <label for="archivoInput" class="btn-archivo">Agregar pintura</label>
+        <input type="file" id="archivoInput" accept="image/*" onchange="guardarPintura(event)">
+    </div>
+
+    <!-- Estructura visual de la Tienda -->
+    <div class="estructura-tienda">
+        <div class="letrero-tienda">🏪 ESTANTES DE LA TIENDA 🏪</div>
+        <div id="galeria" class="galeria"></div>
+    </div>
+
+    <!-- Ventana flotante (Modal) para elegir pago -->
+    <div id="modalPago" class="modal">
+        <div class="modal-contenido">
+            <h3>Elige tu forma de pago</h3>
+            <select id="selectModalPago" class="select-pago">
+                <option value="Tarjeta Visa">Tarjeta Visa</option>
+                <option value="Efectivo">Efectivo</option>
+            </select>
+            <button class="btn-modal-confirmar" onclick="confirmarCompraModal()">Aceptar</button>
+            <button class="btn-modal-cancelar" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", cargarPinturas);
+        let precioActualSeleccionado = 0;
+
+        function guardarPintura(event) {
+            let precio = document.getElementById("precioInput").value;
+            let archivo = event.target.files[0];
+
+            if (!precio) {
+                alert("Por favor, ingresa un precio primero.");
+                return;
+            }
+
+            if (archivo) {
+                let lector = new FileReader();
+                lector.onload = function(e) {
+                    let imagenBase64 = e.target.result;
+
+                    let nuevaPintura = {
+                        precio: precio,
+                        imagen: imagenBase64
+                    };
+
+                    let pinturasGuardadas = JSON.parse(localStorage.getItem("pinturasTienda")) || [];
+                    pinturasGuardadas.push(nuevaPintura);
+
+                    localStorage.setItem("pinturasTienda", JSON.stringify(pinturasGuardadas));
+                    document.getElementById("precioInput").value = "";
+                    cargarPinturas();
+                }
+                lector.readAsDataURL(archivo);
+            }
+        }
+
+        function cargarPinturas() {
+            let galeria = document.getElementById("galeria");
+            galeria.innerHTML = "";
+
+            let pinturasGuardadas = JSON.parse(localStorage.getItem("pinturasTienda")) || [];
+
+            pinturasGuardadas.forEach((pintura) => {
+                let tarjeta = document.createElement("div");
+                tarjeta.className = "tarjeta-pintura";
+                tarjeta.innerHTML = `
+                    <img src="${pintura.imagen}" alt="Pintura">
+                    <div class="precio">$${pintura.precio}</div>
+                    <button class="btn-comprar" onclick="abrirModal(${pintura.precio})">Comprar</button>
+                `;
+                galeria.appendChild(tarjeta);
+            });
+        }
+
+        function abrirModal(precio) {
+            precioActualSeleccionado = precio;
+            document.getElementById("modalPago").style.display = "flex";
+        }
+
+        function cerrarModal() {
+            document.getElementById("modalPago").style.display = "none";
+        }
+
+        function confirmarCompraModal() {
+            let tipoPago = document.getElementById("selectModalPago").value;
+            cerrarModal();
+
+            alert("¡Has pagado $" + precioActualSeleccionado + " con " + tipoPago + "! Abriendo Google Maps en LCG Las cosas que me gustan.");
+            
+            // Ubicación fija en LCG Las cosas que me gustan
+            let lugarTienda = "LCG Las cosas que me gustan";
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugarTienda)}`, "_blank");
+        }
+    </script>
+</body>
+</html>
